@@ -1,6 +1,10 @@
 #!/bin/bash
 # inilatex version with find
 
+
+################## TODO:
+#	- check basename & dirname commands to perform 'local' searches 
+
 pres=0
 tikz=0
 git=0
