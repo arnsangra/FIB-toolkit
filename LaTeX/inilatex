@@ -3,7 +3,7 @@
 
 
 ################## TODO:
-#	- check basename & dirname commands to perform 'local' searches 
+#	- check basename & dirname commands to perform 'local' searches
 
 pres=0
 tikz=0
@@ -13,90 +13,89 @@ pushd `dirname $0` > /dev/null
 scriptdir=`pwd -P`
 popd > /dev/null
 
-    #echo $scriptdir
+#echo $scriptdir
 
-    usage() {
+usage() {
+    echo 'Usage: [inilatex project_name] [options]'
+    echo [options]:
+    echo '	-t	creates tikz directory'
+    echo '	-p	creates presentation directory'
+    echo '	-g	creates LaTeX .gitignore specific file'
+    echo '	-h	prints this help'
+}
 
-	echo 'Usage: [inilatex project_name] [options]'
-	echo [options]:
-	echo '	-t	creates tikz directory'
-	echo '	-p	creates presentation directory'
-	echo '	-g	creates LaTeX .gitignore specific file'
-	echo '	-h	prints this help'
-    }
+checkParams() {
+    if [[ (( $# < 1 )) || $1 =~ "-h" || $1 =~ "--help" ]]; then
+        return 1
+    else return 0
+    fi
+}
 
-    checkParams() {
-	if [[ (( $# < 1 )) || $1 =~ "-h" || $1 =~ "--help" ]]; then
-	    return 1
-	else return 0
-	fi
-    }
+#handle additional arguments through getopts:
+while getopts "pth" opt $2; do
+    case $opt in
+        p)
+            pres=1
+            ;;
+        t)
+            tikz=1
+            ;;
+        g)
+            git=1
+            ;;
+        h)
+            usage
+            exit 0
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG"
+            usage
+            exit 1
+            ;;
+        :)
+            usage
+            exit 1
+            ;;
+    esac
+done
 
-    #handle additional arguments through getopts:
-    while getopts "pth" opt $2; do
-	case $opt in
-	    p)
-		pres=1
-		;;
-	    t)
-		tikz=1
-		;;
-	    g)
-		git=1
-		;;
-	    h)
-		usage
-		exit 0
-		;;
-	    \?)
-		echo "Invalid option: -$OPTARG"
-		usage
-		exit 1
-		;;
-	esac
-    done
-
-    if checkParams; then
-	usage
-    else
-	echo ...creating project $1 folder
-	if ! mkdir $1 2> /dev/null; then
-	    echo 'error creating the project folder..'
-	    echo 'exiting iniLaTeX...'
-	    exit 1
-	fi
-
-	cd $1
-	mkdir report
-	cd report
-
-	# osx
-	#find $scriptdir/templates -regex '\..*\.tex' -exec cp {} . \;
-	#find -regex '\..*\.tex' -exec echo {} . \;
-	find $scriptdir/templates  -regex '.*\.tex' -exec cp {} . \;
-	cd ..
-	echo "...creating project subfolders"
-	mkdir sections
-	mkdir figures
-
-	#cp /Users/arnsangra/Dropbox/current/modularLaTeX/figures/* ./figures
-	cp $scriptdir/templates/figures/* ./figures
-
-	if (( $pres == 1 )); then
-	    mkdir presentation
-	fi
-	if (( $tikz == 1 )); then
-	    mkdir tikz
-	    fi
-	if (( $git == 0 )); then
-	    cp $scriptdir/templates/gitignore ./.gitignore
-	fi
-
-	echo Done!
-	echo "Have fun with LaTeX!"
+if checkParams; then
+    usage
+else
+    echo ...creating project $1 folder
+    if ! mkdir $1 2> /dev/null; then
+        echo 'error creating the project folder..'
+        echo 'exiting iniLaTeX...'
+        exit 1
     fi
 
+    cd $1
+    mkdir report
+    cd report
 
+    # osx
+    #find $scriptdir/templates -regex '\..*\.tex' -exec cp {} . \;
+    #find -regex '\..*\.tex' -exec echo {} . \;
+    find $scriptdir/templates  -regex '.*\.tex' -exec cp {} . \;
+    cd ..
+    echo "...creating project subfolders"
+    mkdir sections
+    mkdir figures
 
+    #cp /Users/arnsangra/Dropbox/current/modularLaTeX/figures/* ./figures
+    cp $scriptdir/templates/figures/* ./figures
 
+    if (( $pres == 1 )); then
+        mkdir presentation
+    fi
+    if (( $tikz == 1 )); then
+        mkdir tikz
+    fi
+    if (( $git == 0 )); then
+        cp $scriptdir/templates/gitignore ./.gitignore
+    fi
+
+    echo Done!
+    echo "Have fun with LaTeX!"
+fi
 
